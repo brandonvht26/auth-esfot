@@ -10,19 +10,25 @@ import { Button }       from "@/shared/ui/Button";
 import { theme }        from "@/core/styles/theme";
  
 export const RegisterPage = () => {
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm,  setConfirm]  = useState("");
-  const [success,  setSuccess]  = useState(false);
+  const [email,     setEmail]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [confirm,   setConfirm]   = useState("");
+  const [showPass,  setShowPass]  = useState(false);
+  const [showConf,  setShowConf]  = useState(false);
+  const [success,   setSuccess]   = useState(false);
   const register = useRegister();
- 
+
   const handleRegister = async () => {
     if (!email || !password || !confirm) {
       Alert.alert("Campos requeridos", "Completa todos los campos.");
       return;
     }
-    if (password.length < 8) {
-      Alert.alert("Contraseña débil", "Mínimo 8 caracteres.");
+    const strongPass = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+    if (!strongPass.test(password)) {
+      Alert.alert(
+        "Contraseña débil",
+        "Mínimo 8 caracteres, al menos una mayúscula y un carácter especial (!@#$%^&*)."
+      );
       return;
     }
     if (password !== confirm) {
@@ -74,11 +80,29 @@ export const RegisterPage = () => {
               onChangeText={setEmail} keyboardType="email-address"
               placeholder="tu@correo.com" />
             <Input label="Contraseña" value={password}
-              onChangeText={setPassword} secureTextEntry
-              placeholder="Mínimo 8 caracteres" />
+              onChangeText={setPassword} secureTextEntry={!showPass}
+              placeholder="Mínimo 8 caracteres"
+              rightElement={(
+                <TouchableOpacity
+                  onPress={() => setShowPass((p) => !p)}
+                  style={{ paddingHorizontal:12, paddingVertical:13 }}
+                >
+                  <Text style={{ fontSize:20 }}>{showPass ? "🙈" : "👁"}</Text>
+                </TouchableOpacity>
+              )}
+            />
             <Input label="Confirmar contraseña" value={confirm}
-              onChangeText={setConfirm} secureTextEntry
-              placeholder="Repite tu contraseña" />
+              onChangeText={setConfirm} secureTextEntry={!showConf}
+              placeholder="Repite tu contraseña"
+              rightElement={(
+                <TouchableOpacity
+                  onPress={() => setShowConf((p) => !p)}
+                  style={{ paddingHorizontal:12, paddingVertical:13 }}
+                >
+                  <Text style={{ fontSize:20 }}>{showConf ? "🙈" : "👁"}</Text>
+                </TouchableOpacity>
+              )}
+            />
             <Button onPress={handleRegister}
               isLoading={register.isPending}
               label="Crear cuenta" />

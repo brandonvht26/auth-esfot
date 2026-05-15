@@ -10,8 +10,9 @@ import { Button }          from "@/shared/ui/Button";
 import { theme }           from "@/core/styles/theme";
  
 export const LoginPage = () => {
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
+  const [email,     setEmail]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [showPass,  setShowPass]  = useState(false);
   const login = useLogin();
  
   const handleLogin = async () => {
@@ -58,8 +59,16 @@ export const LoginPage = () => {
               label="Contraseña"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showPass}
               placeholder="Tu contraseña"
+              rightElement={(
+                <TouchableOpacity
+                  onPress={() => setShowPass((p) => !p)}
+                  style={{ paddingHorizontal:12, paddingVertical:13 }}
+                >
+                  <Text style={{ fontSize:20 }}>{showPass ? "🙈" : "👁"}</Text>
+                </TouchableOpacity>
+              )}
             />
             <TouchableOpacity
               onPress={() => router.push("/(auth)/forgot-password")}
