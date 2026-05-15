@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
  
 const supabaseUrl     = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
- 
+
 /**
  * Adaptador que conecta el sistema de storage de Supabase Auth
  * con SecureStore de Expo (encriptado con el KeyStore de Android).
