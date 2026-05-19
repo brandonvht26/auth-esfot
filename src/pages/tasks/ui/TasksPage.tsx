@@ -6,9 +6,11 @@ import {
   StyleSheet,
   Alert,
   View,
+  Text,
+  TextInput,
+  Modal,
 } from "react-native";
 import LottieView from "lottie-react-native";
-import { YStack, XStack, Text, Button, Input, Sheet } from "tamagui";
 import { router } from "expo-router";
 import { useTasks } from "@/features/tasks/model/useTasks";
 import { useCreateTask } from "@/features/tasks/model/useCreateTask";
@@ -67,74 +69,64 @@ export const TasksPage = () => {
   };
 
   const renderItem = ({ item }: { item: Task }) => (
-    <XStack
-      backgroundColor="$background"
-      padding="$4"
-      borderRadius="$4"
-      marginBottom="$2"
-      alignItems="center"
-      gap="$3"
-      borderWidth={1}
-      borderColor="$borderColor"
-      pressStyle={{ opacity: 0.8 }}
+    <TouchableOpacity
+      activeOpacity={0.8}
       onPress={() => openEdit(item)}
+      style={styles.taskItem}
     >
       <TouchableOpacity onPress={() => toggleComplete(item)} style={styles.checkbox}>
-        <Text fontSize={18}>{item.completed ? "✅" : "⬜"}</Text>
+        <Text style={styles.checkboxText}>{item.completed ? "✅" : "⬜"}</Text>
       </TouchableOpacity>
-      <YStack flex={1} gap="$1">
+      <View style={styles.taskContent}>
         <Text
-          fontSize={16}
-          fontWeight="600"
-          textDecorationLine={item.completed ? "line-through" : "none"}
-          opacity={item.completed ? 0.5 : 1}
+          style={[
+            styles.taskTitle,
+            {
+              textDecorationLine: item.completed ? "line-through" : "none",
+              opacity: item.completed ? 0.5 : 1,
+            },
+          ]}
         >
           {item.title}
         </Text>
         {item.description ? (
-          <Text fontSize={13} color="$color11" numberOfLines={1}>
+          <Text style={styles.taskDescription} numberOfLines={1}>
             {item.description}
           </Text>
         ) : null}
-      </YStack>
+      </View>
       <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteBtn}>
-        <Text fontSize={18}>🗑️</Text>
+        <Text style={styles.deleteBtnText}>🗑️</Text>
       </TouchableOpacity>
-    </XStack>
+    </TouchableOpacity>
   );
 
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
-      <YStack flex={1} alignItems="center" justifyContent="center" padding="$8">
+      <View style={styles.emptyContainer}>
         <LottieView
           source={{ uri: "https://assets2.lottiefiles.com/packages/lf20_vyod6x1h.json" }}
           autoPlay
           loop
           style={{ width: 200, height: 200 }}
         />
-        <Text fontSize={16} color="$color11" marginTop="$4">
-          No tienes tareas aún
-        </Text>
-        <Text fontSize={13} color="$color10" marginTop="$2">
-          Presiona + para crear una
-        </Text>
-      </YStack>
+        <Text style={styles.emptyTitle}>No tienes tareas aún</Text>
+        <Text style={styles.emptySubtitle}>Presiona + para crear una</Text>
+      </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <YStack flex={1} padding="$4">
-        <XStack alignItems="center" justifyContent="space-between" marginBottom="$4">
+      <View style={styles.container}>
+        <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text fontSize={24}>←</Text>
+            <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
-          <Text fontSize={22} fontWeight="700">
-            Mis Tareas
-          </Text>
+          <Text style={styles.headerTitle}>Mis Tareas</Text>
           <View style={{ width: 24 }} />
-        </XStack>
+        </View>
 
         <FlatList
           data={tasks}
@@ -145,57 +137,87 @@ export const TasksPage = () => {
           showsVerticalScrollIndicator={false}
         />
 
-        {/* FAB */}
         <TouchableOpacity onPress={openCreate} style={styles.fab}>
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
-      </YStack>
+      </View>
 
-      {/* Sheet para crear/editar */}
-      <Sheet modal open={open} onOpenChange={setOpen} snapPoints={[45]} dismissOnSnapToBottom>
-        <Sheet.Overlay />
-        <Sheet.Frame padding="$6">
-          <Sheet.Handle />
-          <YStack gap="$4" marginTop="$4">
-            <Text fontSize={20} fontWeight="700">
-              {editing ? "Editar tarea" : "Nueva tarea"}
-            </Text>
-            <Input
-              placeholder="Título"
-              value={title}
-              onChangeText={setTitle}
-              size="$4"
-              autoFocus
-            />
-            <Input
-              placeholder="Descripción (opcional)"
-              value={description}
-              onChangeText={setDescription}
-              size="$4"
-              multiline
-              numberOfLines={3}
-              style={{ minHeight: 80, textAlignVertical: "top" }}
-            />
-            <Button
-              onPress={handleSave}
-              backgroundColor="$blue9"
-              color="white"
-              size="$4"
-              disabled={createTask.isPending || updateTask.isPending}
-            >
-              {editing ? "Guardar cambios" : "Crear tarea"}
-            </Button>
-          </YStack>
-        </Sheet.Frame>
-      </Sheet>
+      <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalBody}>
+              <Text style={styles.modalTitle}>
+                {editing ? "Editar tarea" : "Nueva tarea"}
+              </Text>
+              <TextInput
+                placeholder="Título"
+                value={title}
+                onChangeText={setTitle}
+                autoFocus
+                style={styles.input}
+              />
+              <TextInput
+                placeholder="Descripción (opcional)"
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                numberOfLines={3}
+                style={[styles.input, styles.textArea]}
+              />
+              <TouchableOpacity
+                onPress={handleSave}
+                disabled={createTask.isPending || updateTask.isPending}
+                style={styles.saveBtn}
+              >
+                <Text style={styles.saveBtnText}>
+                  {editing ? "Guardar cambios" : "Crear tarea"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f5f5f5" },
+  container: { flex: 1, padding: 16 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  backArrow: { fontSize: 24 },
+  headerTitle: { fontSize: 22, fontWeight: "700" },
+  taskItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
   checkbox: { padding: 4 },
+  checkboxText: { fontSize: 18 },
+  taskContent: { flex: 1, gap: 4 },
+  taskTitle: { fontSize: 16, fontWeight: "600" },
+  taskDescription: { fontSize: 13, color: "#666" },
   deleteBtn: { padding: 8 },
+  deleteBtnText: { fontSize: 18 },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 32,
+  },
+  emptyTitle: { fontSize: 16, color: "#666", marginTop: 16 },
+  emptySubtitle: { fontSize: 13, color: "#888", marginTop: 8 },
   fab: {
     position: "absolute",
     right: 20,
@@ -213,4 +235,42 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   fabText: { color: "#fff", fontSize: 28, lineHeight: 30 },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    minHeight: 300,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#ddd",
+    alignSelf: "center",
+    marginBottom: 8,
+  },
+  modalBody: { gap: 16, marginTop: 8 },
+  modalTitle: { fontSize: 20, fontWeight: "700" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "#fafafa",
+  },
+  textArea: { minHeight: 80, textAlignVertical: "top" },
+  saveBtn: {
+    backgroundColor: "#1B3A6B",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  saveBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

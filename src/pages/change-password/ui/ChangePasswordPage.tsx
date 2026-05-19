@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { SafeAreaView, TouchableOpacity, Alert, StyleSheet } from "react-native";
+import { SafeAreaView, TouchableOpacity, Alert, StyleSheet, View, Text, TextInput } from "react-native";
 import LottieView from "lottie-react-native";
-import { YStack, XStack, Text, Button, Input } from "tamagui";
 import { router } from "expo-router";
 import { useChangePassword } from "@/features/auth/model/useChangePassword";
 
@@ -32,73 +31,91 @@ export const ChangePasswordPage = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <YStack flex={1} padding="$4" gap="$4">
+      <View style={styles.container}>
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <Text fontSize={24}>←</Text>
+          <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
 
-        <YStack alignItems="center" gap="$2" marginBottom="$4">
+        <View style={styles.header}>
           <LottieView
             source={{ uri: "https://assets2.lottiefiles.com/packages/lf20_l3q3xz9q.json" }}
             autoPlay
             loop
             style={{ width: 140, height: 140 }}
           />
-          <Text fontSize={22} fontWeight="700">Cambiar contraseña</Text>
-          <Text fontSize={14} color="$color11">Ingresa tu nueva contraseña</Text>
-        </YStack>
+          <Text style={styles.title}>Cambiar contraseña</Text>
+          <Text style={styles.subtitle}>Ingresa tu nueva contraseña</Text>
+        </View>
 
-        <YStack gap="$3">
-          <XStack alignItems="center" backgroundColor="$background" borderRadius="$4" borderWidth={1} borderColor="$borderColor" paddingRight="$2">
-            <Input
-              flex={1}
+        <View style={styles.form}>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
               placeholder="Nueva contraseña"
               value={newPass}
               onChangeText={setNewPass}
               secureTextEntry={!showNew}
-              borderWidth={0}
-              backgroundColor="transparent"
-              size="$4"
             />
             <TouchableOpacity onPress={() => setShowNew((p) => !p)} style={styles.toggle}>
-              <Text fontSize={18}>{showNew ? "🙈" : "👁"}</Text>
+              <Text style={styles.toggleText}>{showNew ? "🙈" : "👁"}</Text>
             </TouchableOpacity>
-          </XStack>
+          </View>
 
-          <XStack alignItems="center" backgroundColor="$background" borderRadius="$4" borderWidth={1} borderColor="$borderColor" paddingRight="$2">
-            <Input
-              flex={1}
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
               placeholder="Confirmar contraseña"
               value={confirmPass}
               onChangeText={setConfirmPass}
               secureTextEntry={!showConfirm}
-              borderWidth={0}
-              backgroundColor="transparent"
-              size="$4"
             />
             <TouchableOpacity onPress={() => setShowConfirm((p) => !p)} style={styles.toggle}>
-              <Text fontSize={18}>{showConfirm ? "🙈" : "👁"}</Text>
+              <Text style={styles.toggleText}>{showConfirm ? "🙈" : "👁"}</Text>
             </TouchableOpacity>
-          </XStack>
+          </View>
 
-          <Button
+          <TouchableOpacity
             onPress={handleChange}
-            backgroundColor="$blue9"
-            color="white"
-            size="$4"
-            marginTop="$2"
             disabled={changePassword.isPending}
+            style={styles.changeBtn}
           >
-            {changePassword.isPending ? "Cambiando..." : "Cambiar contraseña"}
-          </Button>
-        </YStack>
-      </YStack>
+            <Text style={styles.changeBtnText}>
+              {changePassword.isPending ? "Cambiando..." : "Cambiar contraseña"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f5f5f5" },
+  container: { flex: 1, padding: 16, gap: 16 },
   back: { alignSelf: "flex-start" },
+  backArrow: { fontSize: 24 },
+  header: { alignItems: "center", gap: 8, marginBottom: 16 },
+  title: { fontSize: 22, fontWeight: "700" },
+  subtitle: { fontSize: 14, color: "#666" },
+  form: { gap: 12 },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    paddingRight: 8,
+  },
+  input: { flex: 1, padding: 12, fontSize: 16 },
   toggle: { paddingHorizontal: 12, paddingVertical: 13 },
+  toggleText: { fontSize: 18 },
+  changeBtn: {
+    backgroundColor: "#1B3A6B",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  changeBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

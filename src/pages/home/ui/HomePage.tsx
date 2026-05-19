@@ -127,7 +127,7 @@ export const HomePage = () => {
 const styles = StyleSheet.create({
   safe:              { flex: 1, backgroundColor: theme.colors.bg },
   animatedContainer: { flex: 1 },
-  scroll:            { padding: 24, gap: 20, paddingBottom: 40 },
+  scroll:            { padding: 24, gap: 20, paddingBottom: 60 },
   header:            { backgroundColor: theme.colors.primary, borderRadius: 16,
                        padding: 24, alignItems: "center", ...theme.shadow.card },
   headerIcon:        { fontSize: 48, marginBottom: 8 },
@@ -148,5 +148,5 @@ const styles = StyleSheet.create({
                        color: theme.colors.primary, marginBottom: 4 },
   achievementIcon:   { fontSize: 20 },
   achievementLabel:  { fontSize: 14, color: theme.colors.textMid, flex: 1 },
-  actions:           { gap: 12 },
+  actions:           { gap: 12, paddingBottom: 40 },
 });

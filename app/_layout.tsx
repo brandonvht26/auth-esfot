@@ -37,6 +37,7 @@ export default function RootLayout() {
       <QueryProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
+          <Stack.Screen name="auth/callback" />
           <Stack.Screen name="home" />
           <Stack.Screen name="index" />
         </Stack>
