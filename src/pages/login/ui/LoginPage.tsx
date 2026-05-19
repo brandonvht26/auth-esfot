@@ -6,6 +6,7 @@ import {
 import LottieView from "lottie-react-native";
 import { router }          from "expo-router";
 import { useLogin }        from "@/features/auth/model/useLogin";
+import { useGoogleLogin } from "@/features/auth/model/useGoogleLogin";
 import { Input }           from "@/shared/ui/Input";
 import { Button }          from "@/shared/ui/Button";
 import { theme }           from "@/core/styles/theme";
@@ -15,6 +16,17 @@ export const LoginPage = () => {
   const [password,  setPassword]  = useState("");
   const [showPass,  setShowPass]  = useState(false);
   const login = useLogin();
+  const googleLogin = useGoogleLogin();
+
+  const handleGoogleLogin = async () => {
+    try {
+      await googleLogin.mutateAsync();
+    } catch (err: any) {
+      if (err.message !== "Login cancelado") {
+        Alert.alert("Error", err.message ?? "No se pudo iniciar con Google.");
+      }
+    }
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -97,6 +109,22 @@ export const LoginPage = () => {
               />
             )}
 
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>o</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              onPress={handleGoogleLogin}
+              disabled={googleLogin.isPending}
+              style={styles.googleBtn}
+            >
+              <Text style={styles.googleBtnText}>
+                {googleLogin.isPending ? "Conectando..." : "🔵  Continuar con Google"}
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => router.push("/(auth)/register")}
               style={{ alignItems:"center" }}
@@ -127,6 +155,18 @@ const styles = StyleSheet.create({
   form:      { padding:28, gap:16 },
   link:      { color: theme.colors.accent, fontSize:14 },
   linkMuted: { color: theme.colors.textMuted, fontSize:14 },
+  divider: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: theme.colors.border },
+  dividerText: { color: theme.colors.textMuted, fontSize: 13 },
+  googleBtn: {
+    borderWidth: 1.5,
+    borderColor: "#4285F4",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  googleBtnText: { color: "#4285F4", fontWeight: "700", fontSize: 15 },
   loadingContainer: { alignItems:"center", paddingVertical:8 },
   loadingText: { color: theme.colors.textMuted, fontSize:13, marginTop:4 },
 });

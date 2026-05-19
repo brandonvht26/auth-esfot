@@ -22,6 +22,7 @@
     "@tamagui/core": "^2.0.0-rc.42",
     "@tanstack/react-query": "^5.100.10",
     "expo": "~54.0.33",
+    "expo-auth-session": "~7.0.11",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.11",
     "expo-haptics": "~15.0.8",

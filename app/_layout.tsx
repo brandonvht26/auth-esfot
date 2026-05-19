@@ -1,42 +1,43 @@
 import { useEffect } from "react";
 import { Stack, router } from "expo-router";
 import { TamaguiProvider } from "tamagui";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import { QueryProvider } from "@/core/providers/QueryProvider";
-import { useSession }    from "@/features/session/model/useSession";
+import { useSession } from "@/features/session/model/useSession";
 import tamaguiConfig from "../tamagui.config";
- 
-// Componente interno que maneja la redirección basada en auth.
-// Está dentro de QueryProvider para poder usar useSession.
+
 function AuthGuard() {
   const { isAuthenticated, isLoading } = useSession();
- 
+
   useEffect(() => {
-    if (isLoading) return; // Esperar a que se cargue la sesión
- 
+    if (isLoading) return;
     if (isAuthenticated) {
-      // Usuario autenticado → ir a la pantalla principal
       router.replace("/home");
     } else {
-      // Sin sesión → ir al login
       router.replace("/(auth)/login");
     }
   }, [isAuthenticated, isLoading]);
- 
-  return null; // Este componente no renderiza nada, solo navega
+
+  return null;
 }
- 
+
 export default function RootLayout() {
-  useEffect(() => {}, []); // no-op para satisfacer el compiler (reset.css solo aplica en web)
+  useEffect(() => {
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      if (url.includes("authesfot://")) {
+        WebBrowser.dismissBrowser();
+      }
+    });
+    return () => subscription.remove();
+  }, []);
 
   return (
-    <TamaguiProvider config={tamaguiConfig}>
+    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       <QueryProvider>
         <Stack screenOptions={{ headerShown: false }}>
-          {/* Grupo de rutas de autenticación */}
           <Stack.Screen name="(auth)" />
-          {/* Pantalla principal */}
-          <Stack.Screen name="home"  />
-          {/* Ruta índice: solo redirige, no muestra nada */}
+          <Stack.Screen name="home" />
           <Stack.Screen name="index" />
         </Stack>
         <AuthGuard />
