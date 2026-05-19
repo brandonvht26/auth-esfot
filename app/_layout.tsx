@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { Stack }     from "expo-router";
-import { router }    from "expo-router";
+import { Stack, router } from "expo-router";
 import { TamaguiProvider } from "tamagui";
 import { QueryProvider } from "@/core/providers/QueryProvider";
 import { useSession }    from "@/features/session/model/useSession";
@@ -27,6 +26,8 @@ function AuthGuard() {
 }
  
 export default function RootLayout() {
+  useEffect(() => {}, []); // no-op para satisfacer el compiler (reset.css solo aplica en web)
+
   return (
     <TamaguiProvider config={tamaguiConfig}>
       <QueryProvider>
