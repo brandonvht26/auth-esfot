@@ -1,43 +1,45 @@
 import { useRef, useEffect, useCallback } from "react";
-import {
-  View, Text, StyleSheet, SafeAreaView,
-  TouchableOpacity, Alert, Animated, ScrollView,
-} from "react-native";
-import { router }    from "expo-router";
-import { YStack, XStack } from "tamagui";
+import { StyleSheet, SafeAreaView, Alert, Animated, ScrollView } from "react-native";
+import LottieView from "lottie-react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { YStack, XStack, Card, Button, Text, View } from "tamagui";
 import { useSession } from "@/features/session/model/useSession";
-import { Button }     from "@/shared/ui/Button";
-import { theme }      from "@/core/styles/theme";
-
-const achievements = [
-  { icon: "🔐", label: "Autenticación con Supabase Auth" },
-  { icon: "🔑", label: "Tokens persistidos con SecureStore" },
-  { icon: "⚡", label: "Estado de sesión con TanStack Query" },
-  { icon: "🧩", label: "Arquitectura Feature-Sliced Design" },
-  { icon: "📱", label: "Expo Router con TypeScript" },
-  { icon: "🌐", label: "App web en Vercel para auth flows" },
-  { icon: "📋", label: "CRUD de Tareas con Supabase" },
-];
+import { theme } from "@/core/styles/theme";
 
 export const HomePage = () => {
   const { user, signOut } = useSession();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
+  const card1 = useRef(new Animated.Value(0)).current;
+  const card2 = useRef(new Animated.Value(0)).current;
+  const card3 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
+      Animated.spring(fadeAnim, {
         toValue: 1,
-        duration: 600,
         useNativeDriver: true,
+        tension: 40,
+        friction: 6,
       }),
-      Animated.timing(slideAnim, {
+      Animated.spring(slideAnim, {
         toValue: 0,
-        duration: 600,
         useNativeDriver: true,
+        tension: 40,
+        friction: 6,
       }),
     ]).start();
-  }, [fadeAnim, slideAnim]);
+
+    Animated.stagger(250, [card1, card2, card3].map((val) =>
+      Animated.spring(val, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 60,
+        friction: 8,
+      })
+    )).start();
+  }, [fadeAnim, slideAnim, card1, card2, card3]);
 
   const handleSignOut = useCallback(() => {
     Alert.alert(
@@ -59,6 +61,16 @@ export const HomePage = () => {
         ]}
       >
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {/* Lottie animación superior */}
+          <YStack alignItems="center" marginBottom="$1">
+            <LottieView
+              source={{ uri: "https://assets2.lottiefiles.com/packages/lf20_l3q3xz9q.json" }}
+              autoPlay
+              loop
+              style={{ width: 120, height: 120 }}
+            />
+          </YStack>
+
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.headerIcon}>🎓</Text>
@@ -81,43 +93,66 @@ export const HomePage = () => {
             <Text style={styles.emailText}>{user?.email}</Text>
           </View>
 
-          {/* Logros como cards Tamagui */}
-          <YStack gap="$2">
-            <Text style={styles.achievementsTitle}>Lo que implementaste:</Text>
-            {achievements.map((item) => (
-              <XStack
-                key={item.label}
-                backgroundColor="$background"
-                padding="$3"
-                borderRadius="$3"
-                gap="$3"
-                alignItems="center"
-                borderWidth={1}
-                borderColor="$borderColor"
+          {/* Acciones como Cards Tamagui en columna */}
+          <YStack gap={14}>
+            <Animated.View style={{ opacity: card1, transform: [{ translateY: card1.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }}>
+              <Card
+                elevate
+                padded
+                onPress={() => router.push("/tasks")}
+                backgroundColor="$blue9"
+                borderRadius="$4"
+                width="100%"
+                pressStyle={{ scale: 0.92, opacity: 0.85 }}
               >
-                <Text style={styles.achievementIcon}>{item.icon}</Text>
-                <Text style={styles.achievementLabel}>{item.label}</Text>
-              </XStack>
-            ))}
+                <Card.Header alignItems="center" gap="$2">
+                  <Ionicons name="list-outline" size={28} color="white" />
+                  <Button.Text color="white" fontWeight="700" fontSize={15}>
+                    Mis Tareas
+                  </Button.Text>
+                </Card.Header>
+              </Card>
+            </Animated.View>
+
+            <Animated.View style={{ opacity: card2, transform: [{ translateY: card2.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }}>
+              <Card
+                elevate
+                padded
+                onPress={() => router.push("/change-password")}
+                backgroundColor="$blue9"
+                borderRadius="$4"
+                width="100%"
+                pressStyle={{ scale: 0.92, opacity: 0.85 }}
+              >
+                <Card.Header alignItems="center" gap="$2">
+                  <Ionicons name="lock-closed-outline" size={28} color="white" />
+                  <Button.Text color="white" fontWeight="700" fontSize={15}>
+                    Cambiar contraseña
+                  </Button.Text>
+                </Card.Header>
+              </Card>
+            </Animated.View>
+
+            <Animated.View style={{ opacity: card3, transform: [{ translateY: card3.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }}>
+              <Card
+                elevate
+                padded
+                onPress={handleSignOut}
+                backgroundColor="$blue9"
+                borderRadius="$4"
+                width="100%"
+                pressStyle={{ scale: 0.92, opacity: 0.85 }}
+              >
+                <Card.Header alignItems="center" gap="$2">
+                  <Ionicons name="log-out-outline" size={28} color="white" />
+                  <Button.Text color="white" fontWeight="700" fontSize={15}>
+                    Cerrar sesión
+                  </Button.Text>
+                </Card.Header>
+              </Card>
+            </Animated.View>
           </YStack>
 
-          {/* Botones de acción */}
-          <View style={styles.actions}>
-            <Button
-              onPress={() => router.push("/tasks")}
-              label="📋 Mis Tareas"
-            />
-            <Button
-              onPress={() => router.push("/change-password")}
-              label="🔑 Cambiar contraseña"
-              variant="ghost"
-            />
-            <Button
-              onPress={handleSignOut}
-              label="Cerrar sesión"
-              variant="ghost"
-            />
-          </View>
         </ScrollView>
       </Animated.View>
     </SafeAreaView>
@@ -127,7 +162,7 @@ export const HomePage = () => {
 const styles = StyleSheet.create({
   safe:              { flex: 1, backgroundColor: theme.colors.bg },
   animatedContainer: { flex: 1 },
-  scroll:            { padding: 24, gap: 20, paddingBottom: 60 },
+  scroll:            { padding: 20, gap: 16, paddingBottom: 60 },
   header:            { backgroundColor: theme.colors.primary, borderRadius: 16,
                        padding: 24, alignItems: "center", ...theme.shadow.card },
   headerIcon:        { fontSize: 48, marginBottom: 8 },
@@ -144,9 +179,5 @@ const styles = StyleSheet.create({
   challengeText:     { fontSize: 18, color: theme.colors.textMid,
                        fontWeight: "600", marginBottom: 8 },
   emailText:         { fontSize: 13, color: theme.colors.textMuted },
-  achievementsTitle: { fontSize: 15, fontWeight: "700",
-                       color: theme.colors.primary, marginBottom: 4 },
-  achievementIcon:   { fontSize: 20 },
-  achievementLabel:  { fontSize: 14, color: theme.colors.textMid, flex: 1 },
-  actions:           { gap: 12, paddingBottom: 40 },
+
 });

@@ -3,12 +3,14 @@ import {
   View, Text, StyleSheet, KeyboardAvoidingView,
   Platform, Alert, TouchableOpacity, ScrollView
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 import { router }       from "expo-router";
 import { useRegister }  from "@/features/auth/model/useRegister";
 import { Input }        from "@/shared/ui/Input";
 import { Button }       from "@/shared/ui/Button";
 import { theme }        from "@/core/styles/theme";
- 
+
 export const RegisterPage = () => {
   const [email,     setEmail]     = useState("");
   const [password,  setPassword]  = useState("");
@@ -42,11 +44,11 @@ export const RegisterPage = () => {
       Alert.alert("Error al registrarse", err.message);
     }
   };
- 
+
   if (success) {
     return (
       <View style={styles.successContainer}>
-        <Text style={styles.successIcon}>📬</Text>
+        <Ionicons name="mail-outline" size={72} color={theme.colors.primary} style={{ marginBottom: 24 }} />
         <Text style={styles.successTitle}>¡Revisa tu email!</Text>
         <Text style={styles.successText}>
           Te enviamos un link de confirmación a{" "}
@@ -54,12 +56,14 @@ export const RegisterPage = () => {
           {"  "}Confirma tu cuenta para poder iniciar sesión.
         </Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.link}>← Volver al login</Text>
+          <Text style={styles.link}>
+            <Ionicons name="arrow-back" size={15} color={theme.colors.accent} /> Volver al login
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
- 
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -71,7 +75,12 @@ export const RegisterPage = () => {
       >
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={styles.logo}>✨</Text>
+            <LottieView
+              source={{ uri: "https://assets2.lottiefiles.com/packages/lf20_l3q3xz9q.json" }}
+              autoPlay
+              loop
+              style={{ width: 150, height: 150 }}
+            />
             <Text style={styles.title}>Crear cuenta</Text>
             <Text style={styles.subtitle}>ESFOT — Únete ahora</Text>
           </View>
@@ -87,7 +96,11 @@ export const RegisterPage = () => {
                   onPress={() => setShowPass((p) => !p)}
                   style={{ paddingHorizontal:12, paddingVertical:13 }}
                 >
-                  <Text style={{ fontSize:20 }}>{showPass ? "🙈" : "👁"}</Text>
+                  <Ionicons
+                    name={showPass ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color="#888"
+                  />
                 </TouchableOpacity>
               )}
             />
@@ -99,7 +112,11 @@ export const RegisterPage = () => {
                   onPress={() => setShowConf((p) => !p)}
                   style={{ paddingHorizontal:12, paddingVertical:13 }}
                 >
-                  <Text style={{ fontSize:20 }}>{showConf ? "🙈" : "👁"}</Text>
+                  <Ionicons
+                    name={showConf ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color="#888"
+                  />
                 </TouchableOpacity>
               )}
             />
@@ -123,7 +140,7 @@ export const RegisterPage = () => {
     </KeyboardAvoidingView>
   );
 };
- 
+
 const styles = StyleSheet.create({
   container:        { flex:1, backgroundColor: theme.colors.bg },
   scroll:           { flexGrow:1, justifyContent:"center", padding:24 },
@@ -131,7 +148,6 @@ const styles = StyleSheet.create({
                       overflow:"hidden", ...theme.shadow.card },
   header:           { backgroundColor: theme.colors.primary, padding:32,
                       alignItems:"center" },
-  logo:             { fontSize:52, marginBottom:12 },
   title:            { color:"#fff", fontSize:26, fontWeight:"700", marginBottom:4 },
   subtitle:         { color:"rgba(255,255,255,0.75)", fontSize:14 },
   form:             { padding:28, gap:16 },
@@ -140,7 +156,6 @@ const styles = StyleSheet.create({
   linkMuted:        { color: theme.colors.textMuted, fontSize:14 },
   successContainer: { flex:1, backgroundColor: theme.colors.bg,
                       justifyContent:"center", alignItems:"center", padding:32 },
-  successIcon:      { fontSize:72, marginBottom:24 },
   successTitle:     { fontSize:26, fontWeight:"700",
                       color: theme.colors.primary, marginBottom:16 },
   successText:      { fontSize:16, color: theme.colors.textMid,

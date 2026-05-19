@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  FlatList,
   SafeAreaView,
   TouchableOpacity,
   StyleSheet,
@@ -9,9 +8,12 @@ import {
   Text,
   TextInput,
   Modal,
+  ScrollView,
 } from "react-native";
 import LottieView from "lottie-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { XStack, YStack, AnimatePresence } from "tamagui";
 import { useTasks } from "@/features/tasks/model/useTasks";
 import { useCreateTask } from "@/features/tasks/model/useCreateTask";
 import { useUpdateTask } from "@/features/tasks/model/useUpdateTask";
@@ -68,39 +70,6 @@ export const TasksPage = () => {
     ]);
   };
 
-  const renderItem = ({ item }: { item: Task }) => (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => openEdit(item)}
-      style={styles.taskItem}
-    >
-      <TouchableOpacity onPress={() => toggleComplete(item)} style={styles.checkbox}>
-        <Text style={styles.checkboxText}>{item.completed ? "✅" : "⬜"}</Text>
-      </TouchableOpacity>
-      <View style={styles.taskContent}>
-        <Text
-          style={[
-            styles.taskTitle,
-            {
-              textDecorationLine: item.completed ? "line-through" : "none",
-              opacity: item.completed ? 0.5 : 1,
-            },
-          ]}
-        >
-          {item.title}
-        </Text>
-        {item.description ? (
-          <Text style={styles.taskDescription} numberOfLines={1}>
-            {item.description}
-          </Text>
-        ) : null}
-      </View>
-      <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteBtn}>
-        <Text style={styles.deleteBtnText}>🗑️</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
@@ -120,25 +89,78 @@ export const TasksPage = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+        <View style={styles.lottieTop}>
+          <LottieView
+            source={{ uri: "https://assets2.lottiefiles.com/packages/lf20_vyod6x1h.json" }}
+            autoPlay
+            loop
+            style={{ width: 80, height: 80 }}
+          />
+        </View>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backArrow}>←</Text>
+            <Ionicons name="arrow-back" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Mis Tareas</Text>
           <View style={{ width: 24 }} />
         </View>
 
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          ListEmptyComponent={renderEmpty}
-          contentContainerStyle={tasks?.length ? undefined : { flex: 1 }}
-          showsVerticalScrollIndicator={false}
-        />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={tasks?.length ? styles.listContent : { flex: 1 }}>
+          <AnimatePresence>
+            {tasks?.map((item, index) => (
+              <XStack
+                key={item.id}
+                animation="bouncy"
+                enterStyle={{ opacity: 0, scale: 0.9, y: 10 }}
+                exitStyle={{ opacity: 0, scale: 0.8, x: -20 }}
+                animationDelay={index * 100}
+                pressStyle={{ scale: 0.95, opacity: 0.8 }}
+                onPress={() => openEdit(item)}
+                backgroundColor="#fff"
+                padding={16}
+                borderRadius={12}
+                marginBottom={8}
+                borderWidth={1}
+                borderColor="#e0e0e0"
+                alignItems="center"
+                gap={12}
+              >
+                <TouchableOpacity onPress={() => toggleComplete(item)} style={styles.checkbox}>
+                  <Ionicons
+                    name={item.completed ? "checkmark-circle" : "square-outline"}
+                    size={22}
+                    color={item.completed ? "#22c55e" : "#888"}
+                  />
+                </TouchableOpacity>
+                <YStack flex={1} gap={4}>
+                  <Text
+                    style={[
+                      styles.taskTitle,
+                      {
+                        textDecorationLine: item.completed ? "line-through" : "none",
+                        opacity: item.completed ? 0.5 : 1,
+                      },
+                    ]}
+                  >
+                    {item.title}
+                  </Text>
+                  {item.description ? (
+                    <Text style={styles.taskDescription} numberOfLines={1}>
+                      {item.description}
+                    </Text>
+                  ) : null}
+                </YStack>
+                <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteBtn}>
+                  <Ionicons name="trash-outline" size={20} color="#888" />
+                </TouchableOpacity>
+              </XStack>
+            ))}
+          </AnimatePresence>
+          {!tasks?.length && renderEmpty()}
+        </ScrollView>
 
         <TouchableOpacity onPress={openCreate} style={styles.fab}>
-          <Text style={styles.fabText}>+</Text>
+          <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -185,31 +207,19 @@ export const TasksPage = () => {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f5f5f5" },
   container: { flex: 1, padding: 16 },
+  lottieTop: { alignItems: "center", marginBottom: 4 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  backArrow: { fontSize: 24 },
   headerTitle: { fontSize: 22, fontWeight: "700" },
-  taskItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
+  listContent: { paddingBottom: 80 },
   checkbox: { padding: 4 },
-  checkboxText: { fontSize: 18 },
-  taskContent: { flex: 1, gap: 4 },
   taskTitle: { fontSize: 16, fontWeight: "600" },
   taskDescription: { fontSize: 13, color: "#666" },
   deleteBtn: { padding: 8 },
-  deleteBtnText: { fontSize: 18 },
   emptyContainer: {
     flex: 1,
     alignItems: "center",
@@ -234,7 +244,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
   },
-  fabText: { color: "#fff", fontSize: 28, lineHeight: 30 },
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",

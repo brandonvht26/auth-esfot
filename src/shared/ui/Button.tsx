@@ -32,7 +32,9 @@ export const Button = ({
       borderRadius={12}
       paddingVertical={14}
       paddingHorizontal={24}
-      pressStyle={{ opacity: 0.8 }}
+      animation="bouncy"
+      pressStyle={{ scale: 0.95, opacity: 0.8 }}
+      color={v.color}
     >
       {isLoading ? <Spinner color={v.color} /> : label}
     </TamaguiButton>

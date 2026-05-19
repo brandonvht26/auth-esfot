@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { SafeAreaView, TouchableOpacity, Alert, StyleSheet, View, Text, TextInput } from "react-native";
+import { SafeAreaView, TouchableOpacity, Alert, StyleSheet, View, Text, TextInput, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { router } from "expo-router";
 import { useChangePassword } from "@/features/auth/model/useChangePassword";
@@ -9,6 +10,7 @@ export const ChangePasswordPage = () => {
   const [confirmPass, setConfirmPass] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [focusedField, setFocusedField] = useState<"new" | "confirm" | null>(null);
   const changePassword = useChangePassword();
 
   const handleChange = async () => {
@@ -29,11 +31,16 @@ export const ChangePasswordPage = () => {
     }
   };
 
+  const focusedStyle = (field: "new" | "confirm") => ({
+    borderColor: focusedField === field ? "#1B3A6B" : "#e0e0e0",
+    transform: [{ scale: focusedField === field ? 1.02 : 1 }],
+  });
+
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <Text style={styles.backArrow}>←</Text>
+          <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
 
         <View style={styles.header}>
@@ -48,35 +55,40 @@ export const ChangePasswordPage = () => {
         </View>
 
         <View style={styles.form}>
-          <View style={styles.inputRow}>
+          <View style={[styles.inputRow, focusedStyle("new")]}>
             <TextInput
               style={styles.input}
               placeholder="Nueva contraseña"
               value={newPass}
               onChangeText={setNewPass}
               secureTextEntry={!showNew}
+              onFocus={() => setFocusedField("new")}
+              onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowNew((p) => !p)} style={styles.toggle}>
-              <Text style={styles.toggleText}>{showNew ? "🙈" : "👁"}</Text>
+              <Ionicons name={showNew ? "eye-off-outline" : "eye-outline"} size={22} color="#888" />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.inputRow}>
+          <View style={[styles.inputRow, focusedStyle("confirm")]}>
             <TextInput
               style={styles.input}
               placeholder="Confirmar contraseña"
               value={confirmPass}
               onChangeText={setConfirmPass}
               secureTextEntry={!showConfirm}
+              onFocus={() => setFocusedField("confirm")}
+              onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowConfirm((p) => !p)} style={styles.toggle}>
-              <Text style={styles.toggleText}>{showConfirm ? "🙈" : "👁"}</Text>
+              <Ionicons name={showConfirm ? "eye-off-outline" : "eye-outline"} size={22} color="#888" />
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             onPress={handleChange}
             disabled={changePassword.isPending}
+            activeOpacity={0.8}
             style={styles.changeBtn}
           >
             <Text style={styles.changeBtnText}>
@@ -84,16 +96,15 @@ export const ChangePasswordPage = () => {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f5f5f5" },
-  container: { flex: 1, padding: 16, gap: 16 },
-  back: { alignSelf: "flex-start" },
-  backArrow: { fontSize: 24 },
+  container: { padding: 16, gap: 16 },
+  back: { alignSelf: "flex-start", marginBottom: 4 },
   header: { alignItems: "center", gap: 8, marginBottom: 16 },
   title: { fontSize: 22, fontWeight: "700" },
   subtitle: { fontSize: 14, color: "#666" },
@@ -108,8 +119,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   input: { flex: 1, padding: 12, fontSize: 16 },
-  toggle: { paddingHorizontal: 12, paddingVertical: 13 },
-  toggleText: { fontSize: 18 },
+  toggle: { padding: 8 },
   changeBtn: {
     backgroundColor: "#1B3A6B",
     borderRadius: 12,
