@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { Stack }     from "expo-router";
 import { router }    from "expo-router";
+import { TamaguiProvider } from "tamagui";
 import { QueryProvider } from "@/core/providers/QueryProvider";
 import { useSession }    from "@/features/session/model/useSession";
+import tamaguiConfig from "../tamagui.config";
  
 // Componente interno que maneja la redirección basada en auth.
 // Está dentro de QueryProvider para poder usar useSession.
@@ -26,16 +28,18 @@ function AuthGuard() {
  
 export default function RootLayout() {
   return (
-    <QueryProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Grupo de rutas de autenticación */}
-        <Stack.Screen name="(auth)" />
-        {/* Pantalla principal */}
-        <Stack.Screen name="home"  />
-        {/* Ruta índice: solo redirige, no muestra nada */}
-        <Stack.Screen name="index" />
-      </Stack>
-      <AuthGuard />
-    </QueryProvider>
+    <TamaguiProvider config={tamaguiConfig}>
+      <QueryProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Grupo de rutas de autenticación */}
+          <Stack.Screen name="(auth)" />
+          {/* Pantalla principal */}
+          <Stack.Screen name="home"  />
+          {/* Ruta índice: solo redirige, no muestra nada */}
+          <Stack.Screen name="index" />
+        </Stack>
+        <AuthGuard />
+      </QueryProvider>
+    </TamaguiProvider>
   );
 }

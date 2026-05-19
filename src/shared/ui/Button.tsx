@@ -1,7 +1,6 @@
-import {
-  TouchableOpacity, Text, ActivityIndicator, StyleSheet
-} from "react-native";
- 
+import { Button as TamaguiButton, Spinner } from "tamagui";
+import { theme } from "@/core/styles/theme";
+
 interface ButtonProps {
   onPress:    () => void;
   label:      string;
@@ -9,33 +8,33 @@ interface ButtonProps {
   variant?:   "primary" | "ghost" | "danger";
   disabled?:  boolean;
 }
- 
+
+const variantMap = {
+  primary: { backgroundColor: theme.colors.primary, color: "#fff", borderWidth: 0 },
+  ghost:   { backgroundColor: "transparent", color: theme.colors.primary, borderWidth: 2, borderColor: theme.colors.primary },
+  danger:  { backgroundColor: theme.colors.danger, color: "#fff", borderWidth: 0 },
+} as const;
+
 export const Button = ({
   onPress, label, isLoading, variant = "primary", disabled
 }: ButtonProps) => {
   const isDisabled = disabled || isLoading;
+  const v = variantMap[variant];
+
   return (
-    <TouchableOpacity
+    <TamaguiButton
       onPress={onPress}
       disabled={isDisabled}
-      style={[styles.base, styles[variant], isDisabled && styles.disabled]}
-      activeOpacity={0.8}
+      opacity={isDisabled ? 0.5 : 1}
+      backgroundColor={v.backgroundColor}
+      borderWidth={v.borderWidth}
+      borderColor={"borderColor" in v ? (v as any).borderColor : undefined}
+      borderRadius={12}
+      paddingVertical={14}
+      paddingHorizontal={24}
+      pressStyle={{ opacity: 0.8 }}
     >
-      {isLoading
-        ? <ActivityIndicator color="#fff" />
-        : <Text style={[styles.label, variant === "ghost" && styles.labelGhost]}>{label}</Text>
-      }
-    </TouchableOpacity>
+      {isLoading ? <Spinner color={v.color} /> : label}
+    </TamaguiButton>
   );
 };
- 
-const styles = StyleSheet.create({
-  base:        { borderRadius:12, paddingVertical:14, paddingHorizontal:24,
-                 alignItems:"center", justifyContent:"center" },
-  primary:     { backgroundColor:"#1B3A6B" },
-  ghost:       { backgroundColor:"transparent", borderWidth:2, borderColor:"#1B3A6B" },
-  danger:      { backgroundColor:"#DC2626" },
-  disabled:    { opacity:0.5 },
-  label:       { color:"#fff", fontSize:16, fontWeight:"600" },
-  labelGhost:  { color:"#1B3A6B" },
-});
