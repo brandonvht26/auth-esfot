@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/shared/api/supabase";
- 
+
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: async (email: string) => {
